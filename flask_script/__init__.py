@@ -155,9 +155,13 @@ class Manager(object):
 
         for name, command in self._commands.items():
             description = getattr(command, 'description', command.__doc__)
-            command_parser = command.create_parser(name, parents=[options_parser])
+            try:
+                command_parser = command.create_parser(name, parents=[options_parser])
+            except TypeError:
+                command_parser = command.create_parser(name)
             subparser = subparsers.add_parser(name, usage=description, help=description,
                                               parents=[command_parser], add_help=False)
+            subparser.set_defaults(func_handle=command.handle)
 
 
         ## enable autocomplete only for parent parser when argcomplete is
